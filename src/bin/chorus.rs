@@ -26,23 +26,23 @@ async fn main() -> Result<(), Error> {
     chorus::setup_logging(&config);
 
     // Log host name
-    log::info!(target: "Server", "HOSTNAME = {}", config.hostname);
+    // log::info!(target: "Server", "HOSTNAME = {}", config.hostname);
 
     let store = chorus::setup_store(&config)?;
     let _ = GLOBALS.store.set(store);
 
     // TLS setup
     let maybe_tls_acceptor = if config.use_tls {
-        log::info!(target: "Server", "Using TLS");
+        //log::info!(target: "Server", "Using TLS");
         Some(chorus::tls::tls_acceptor(&config)?)
     } else {
-        log::info!(target: "Server", "Not using TLS");
+        //log::info!(target: "Server", "Not using TLS");
         None
     };
 
     // Bind listener to port
     let listener = TcpListener::bind((&*config.ip_address, config.port)).await?;
-    log::info!(target: "Server", "Running on {}:{}", config.ip_address, config.port);
+    //log::info!(target: "Server", "Running on {}:{}", config.ip_address, config.port);
 
     // Store config into GLOBALS
     *GLOBALS.config.write() = config;
@@ -96,7 +96,7 @@ async fn main() -> Result<(), Error> {
                 if GLOBALS.config.read().enable_ip_blocking {
                     let ip_data = chorus::get_ip_data(GLOBALS.store.get().unwrap(), hashed_peer.ip())?;
                     if ip_data.is_banned() {
-                        log::debug!(target: "Client",
+                        log::trace!(target: "Client",
                                     "{}: Blocking reconnection until {}",
                                     hashed_peer.ip(),
                                     ip_data.ban_until);

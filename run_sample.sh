@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cargo build --release && \
+cargo build -q --release && \
     ./target/release/chorus ./sample/sample.config.toml

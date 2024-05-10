@@ -152,7 +152,7 @@ async fn handle_http_request(
 
                     // we cheat somewhat and log these websocket open and close messages
                     // as server messages
-                    log::info!(
+                    log::debug!(
                         target: "Server",
                         "{}: TOTAL={}, New Connection: {}, {}",
                         peer,
@@ -211,7 +211,7 @@ async fn handle_http_request(
 
                     // we cheat somewhat and log these websocket open and close messages
                     // as server messages
-                    log::info!(
+                    log::debug!(
                         target: "Server",
                         "{}: TOTAL={}, {}, ban={}s",
                         peer,
@@ -348,7 +348,9 @@ impl WebSocketService {
     async fn handle_websocket_message(&mut self, message: Message) -> Result<(), Error> {
         match message {
             Message::Text(msg) => {
-                log::trace!(target: "Client", "{}: <= {}", self.peer, msg);
+                //log::trace!(target: "Client", "{}: <= {}", self.peer, msg);
+                //log::info!("target: Client, {}: <= {}", self.peer, msg);
+                print!("{}: <= {}\n", self.peer, msg);
                 self.replied = false;
                 // This is defined in nostr.rs
                 if let Err(e) = self.handle_nostr_message(&msg).await {
