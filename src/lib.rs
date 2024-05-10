@@ -7,6 +7,8 @@ pub mod reply;
 pub mod tls;
 pub mod web;
 
+use gnostr_types::Event;
+
 use crate::config::{Config, FriendlyConfig};
 use crate::error::{ChorusError, Error};
 use crate::globals::GLOBALS;
@@ -346,11 +348,17 @@ impl WebSocketService {
     }
 
     async fn handle_websocket_message(&mut self, message: Message) -> Result<(), Error> {
+                let s: String = String::new();
         match message {
             Message::Text(msg) => {
                 //log::trace!(target: "Client", "{}: <= {}", self.peer, msg);
                 //log::info!("target: Client, {}: <= {}", self.peer, msg);
-                print!("{}: <= {}\n", self.peer, msg);
+                log::trace!("{}: <= {}\n", self.peer, msg);
+
+                let event: String = serde_json::ser::to_string(&s).unwrap();
+                //log::trace!("{}{:?}",msg,event);
+                print!("{}{:?}\n",msg,event);
+                //let _ = gnostr_bins::post_event("wss://relay.damus.io", event);
                 self.replied = false;
                 // This is defined in nostr.rs
                 if let Err(e) = self.handle_nostr_message(&msg).await {

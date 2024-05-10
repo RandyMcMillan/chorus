@@ -7,22 +7,22 @@ hostname = "localhost"
 use_tls = false
 certchain_pem_path = "tls/fullchain.pem"
 key_pem_path = "tls/privkey.pem"
-name = "Chorus Sample"
+name = "gnostr"
 description = "A sample run of the Chorus relay"
-open_relay = false
-user_hex_keys = [
-  "a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd"
-]
-verify_events = true
+open_relay = true
+# user_hex_keys = [
+  # "a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd"
+# ]
+verify_events = false
 allow_scraping = false
 allow_scrape_if_limited_to = 100
 allow_scrape_if_max_seconds = 7200
 max_subscriptions = 128
 serve_ephemeral = true
 serve_relay_lists = true
-server_log_level = "Info"
-library_log_level = "Info"
-client_log_level = "Warn"
+server_log_level = "None"
+library_log_level = "None"
+client_log_level = "None"
 enable_ip_blocking = true
 minimum_ban_seconds = 1
 timeout_seconds = 60
