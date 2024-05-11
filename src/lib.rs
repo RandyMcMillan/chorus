@@ -15,7 +15,7 @@ use crate::globals::GLOBALS;
 use crate::ip::{HashedIp, HashedPeer, IpData, SessionExit};
 use crate::reply::NostrReply;
 use crate::tls::MaybeTlsStream;
-use futures::{sink::SinkExt, stream::StreamExt};
+use futures::{executor::block_on, sink::SinkExt, stream::StreamExt};
 use hyper::service::Service;
 use hyper::upgrade::Upgraded;
 use hyper::{Body, Request, Response};
@@ -40,6 +40,43 @@ use tokio::net::TcpStream;
 use tokio::time::Instant;
 use tungstenite::protocol::WebSocketConfig;
 use tungstenite::Message;
+
+//use std::process::Command;
+
+pub async fn run_command(command: &str, arg1: &str, arg2:&str) -> Result<String, Error> {
+    //use async_executor::Executor;
+  //  use async_process::{driver, Command};
+
+
+
+//use futures_lite::{io::BufReader, prelude::*};
+
+//use std::process::Stdio;
+//use futures_lite::AsyncReadExt;
+use async_process::{Command, Stdio};
+use futures_lite::{io::BufReader, prelude::*};
+
+
+    log::info!("command={}",command);
+    log::info!("arg1={}",arg1);
+    log::info!("arg2={}",arg2);
+
+
+let out = Command::new("echo").arg("hello").arg("world").output().await?;
+
+// Convert stdout bytes to a String
+let mut stdout_string = String::from_utf8(out.stdout).expect("invalid utf-8");
+
+println!("Command output:\n{}", stdout_string);
+
+
+let write_result = std::fs::write("data.txt", &mut stdout_string)?;
+println!("Successfully wrote data to data.txt");
+
+
+
+    Ok(String::new())
+}
 
 /// Serve a single network connection
 pub async fn serve(stream: MaybeTlsStream<TcpStream>, peer: HashedPeer) -> Result<(), Error> {
@@ -348,18 +385,42 @@ impl WebSocketService {
     }
 
     async fn handle_websocket_message(&mut self, message: Message) -> Result<(), Error> {
-                let s: String = String::new();
+        let s: String = String::new();
+        static GNOSTR_POST_EVENT: &str = "gnostr-post-event";
+        static ARG1: &str = "";
+        static ARG2: &str = "";
+        let mut long_message = String::with_capacity(128); // Allocate space for 128 bytes
+        //long_message.push_str(msg);
+
         match message {
             Message::Text(msg) => {
                 //log::trace!(target: "Client", "{}: <= {}", self.peer, msg);
                 //log::info!("target: Client, {}: <= {}", self.peer, msg);
                 log::trace!("{}: <= {}\n", self.peer, msg);
 
-                let event: String = serde_json::ser::to_string(&s).unwrap();
+
+
                 //log::trace!("{}{:?}",msg,event);
-                print!("{}{:?}\n",msg,event);
-                //let _ = gnostr_bins::post_event("wss://relay.damus.io", event);
+                //print!("lib.rs:360:{}{:?}\n",msg,event);
+                //print!("lib.rs:361:{}\n", msg);
+                //let msg_event: String = msg.clone();
+                //print!("lib.rs:362:{:?}\n",event);
+                //let _ = gnostr_bins::post_event("wss://relay.damus.io", event.clone());
+                //
+                //
+                //
+                long_message.push_str(&msg);
+                log::info!("416:{}",long_message);
+                let future = run_command(GNOSTR_POST_EVENT, &long_message,ARG2);
+                let result = block_on(future);
+                print!("419:{:}",result.unwrap());
+                //let output = block_on(future);
+                //match output {
+                //    Ok(text) => println!("{}", text),
+                //    Err(err) => println!("Error: {}", err),
+                //}
                 self.replied = false;
+                //self.replied = true;
                 // This is defined in nostr.rs
                 if let Err(e) = self.handle_nostr_message(&msg).await {
                     self.error_punishment += e.inner.punishment();
