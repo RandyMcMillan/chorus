@@ -81,7 +81,7 @@ async fn main() -> Result<(), Error> {
 
                 *GLOBALS.config.write() = config;
 
-                chorus::print_stats();
+                //chorus::print_stats();
             },
 
             // Accepts network connections and spawn a task to serve each one
@@ -167,7 +167,7 @@ async fn main() -> Result<(), Error> {
     log::info!(target: "Server", "Syncing and shutting down.");
     let _ = GLOBALS.store.get().unwrap().sync();
 
-    chorus::print_stats();
+    //chorus::print_stats();
 
     Ok(())
 }
