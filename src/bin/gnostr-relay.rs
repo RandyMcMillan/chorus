@@ -12,6 +12,19 @@ use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 use tokio::signal::unix::{signal, SignalKind};
 
+fn prog(){
+print!("prog");
+std::process::exit(0);
+}
+fn help(){
+print!("help");
+std::process::exit(0);
+}
+fn version(){
+print!("version");
+std::process::exit(0);
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     // Get args (config path)
@@ -30,7 +43,40 @@ async fn main() -> Result<(), Error> {
     //fs::create_dir_all(format!("{}/.gnostr/relay",home::home_dir().display()))?;
 
 
-    let config_path = args.next().unwrap();
+    //let mut args = env::args().skip(1);
+    let mut config_path = "";
+    while let Some(arg) = args.next() {
+        match &arg[..] {
+            "-h" | "--help" => help(),
+            "--version" => version(),
+            "-q" | "--quiet" => {
+                println!("Quiet mode is not supported yet.");
+                std::process::exit(0);
+            }
+            "-v" | "--verbose" => {
+                println!("Verbose mode is not supported yet.");
+                prog();
+            }
+            "-c" | "--config" => {
+                if let Some(config_path) = args.next() {
+//                    let config_path = arg_config;
+                } else {
+                    panic!("No value specified for parameter --config.");
+                }
+            }
+            _ => {
+                if arg.starts_with('-') {
+                    println!("Unkown argument {}", arg);
+                } else {
+                    println!("Unkown positional argument {}", arg);
+                }
+            }
+        }
+    }
+
+
+
+    //let config_path = args.next().unwrap();
 
     let config = chorus::load_config(&config_path)?;
 
