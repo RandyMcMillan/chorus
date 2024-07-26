@@ -20,6 +20,16 @@ async fn main() -> Result<(), Error> {
         panic!("USAGE: chorus <config_path>");
     }
     let _ = args.next(); // ignore program name
+
+    match home::home_dir() {
+        Some(path) if !path.as_os_str().is_empty() => println!("{}", path.display()),
+        _ => println!("Unable to get your home dir!"),
+    }
+    use std::fs;
+    fs::create_dir_all(format!("{}/.gnostr/relay",home::home_dir().expect("REASON").display()));
+    //fs::create_dir_all(format!("{}/.gnostr/relay",home::home_dir().display()))?;
+
+
     let config_path = args.next().unwrap();
 
     let config = chorus::load_config(&config_path)?;
